@@ -23,5 +23,11 @@ try:
         admin_user.role = 'admin'
         admin_user.save()
         print("Superuser 'admin' created automatically.")
+    else:
+        admin_user = User.objects.get(username='admin')
+        if admin_user.role != 'admin':
+            admin_user.role = 'admin'
+            admin_user.save()
+            print("Updated existing admin role to 'admin'.")
 except Exception as e:
     print(f"Skipping superuser creation: {e}")
