@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold h2 mb-1">{{ title }}</h1>
+                    <p class="text-muted mb-0">Fill in the details to attract top talent for your company.</p>
+                </div>
+                <a href="{% url 'recruiter_dashboard' %}" class="btn btn-light btn-sm px-4 fw-bold shadow-sm">
+                    Cancel
+                </a>
+            </div>
+
+            <div class="premium-card p-4 p-md-5">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Job Info Section -->
+                    <div class="mb-5">
+                        <h5 class="fw-bold text-primary mb-4 pb-2 border-bottom">1. Basic Information</h5>
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted">Job Title <span class="text-danger">*</span></label>
+                                {{ form.title }}
+                                {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Category <span class="text-danger">*</span></label>
+                                {{ form.category }}
+                                {% if form.category.errors %}<div class="text-danger smaller mt-1">{{ form.category.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Location <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted border-end-0"><i class="fas fa-map-marker-alt"></i></span>
+                                    {{ form.location }}
+                                </div>
+                                {% if form.location.errors %}<div class="text-danger smaller mt-1">{{ form.location.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Details Section -->
+                    <div class="mb-5">
+                        <h5 class="fw-bold text-primary mb-4 pb-2 border-bottom">2. Job Details & Requirements</h5>
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted">Full Description <span class="text-danger">*</span></label>
+                                {{ form.description }}
+                                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted">Required Skills <span class="text-danger">*</span></label>
+                                <div class="d-flex align-items-center mb-2 text-muted small bg-light p-2 rounded">
+                                    <i class="fas fa-info-circle text-primary me-2"></i> Hold Ctrl (Windows) or Cmd (Mac) to select multiple skills.
+                                </div>
+                                {{ form.required_skills }}
+                                {% if form.required_skills.errors %}<div class="text-danger smaller mt-1">{{ form.required_skills.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Extra Info Section -->
+                    <div class="mb-5">
+                        <h5 class="fw-bold text-primary mb-4 pb-2 border-bottom">3. Compensation</h5>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Salary Range</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted border-end-0"><i class="fas fa-dollar-sign"></i></span>
+                                    {{ form.salary }}
+                                </div>
+                                {% if form.salary.errors %}<div class="text-danger smaller mt-1">{{ form.salary.errors }}</div>{% endif %}
+                                <div class="form-text mt-2">Optional. Leave blank if not applicable.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end border-top pt-4 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm">
+                            Publish Job <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom enhancements for the form */
+    .form-control, .form-select {
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .input-group .form-control {
+        border-left: 0;
+    }
+    
+    .input-group .form-control:focus {
+        border-color: #e2e8f0;
+        box-shadow: none;
+    }
+    
+    .input-group:focus-within {
+        border-radius: 8px;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+    
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .form-control {
+        border-color: var(--primary);
+    }
+    
+    textarea.form-control {
+        min-height: 180px;
+        line-height: 1.6;
+        resize: vertical;
+    }
+    
+    select[multiple].form-select {
+        height: 180px;
+        padding: 0.5rem;
+    }
+    
+    select[multiple].form-select option {
+        padding: 0.5rem 1rem;
+        margin-bottom: 2px;
+        border-radius: 6px;
+    }
+    
+    select[multiple].form-select option:checked {
+        background: linear-gradient(0deg, var(--primary) 0%, var(--primary) 100%);
+        color: white;
+    }
+    
+    .smaller { 
+        font-size: 0.85rem; 
+    }
+</style>
+{% endblock %}

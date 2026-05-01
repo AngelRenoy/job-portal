@@ -1,0 +1,58 @@
+<div class="col-md-2 d-none d-md-block sidebar px-0">
+    <div class="py-4">
+        <h6 class="text-uppercase text-muted small fw-bold mb-3 px-4">Menu</h6>
+        
+        <a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <i class="fas fa-grid-2 me-3"></i> Dashboard
+        </a>
+        <a href="{% url 'admin_jobs' %}" class="sidebar-link {% if 'admin_jobs' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-briefcase me-3"></i> Manage Jobs
+        </a>
+        <a href="{% url 'admin_users' %}" class="sidebar-link {% if 'admin_users' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-users me-3"></i> Manage Users
+        </a>
+        <a href="{% url 'admin_reports' %}" class="sidebar-link {% if 'admin_reports' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-chart-pie me-3"></i> Reports
+        </a>
+        <a href="{% url 'admin_settings' %}" class="sidebar-link {% if 'admin_settings' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-cog me-3"></i> Settings
+        </a>
+        
+        <div class="mt-5 px-4">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3">Account</h6>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-danger text-decoration-none p-0 small fw-bold">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-right: 3px solid transparent;
+    }
+    .sidebar-link:hover {
+        background: #f8fafc;
+        color: var(--primary);
+    }
+    .sidebar-link.active {
+        background: #eff6ff;
+        color: var(--primary);
+        border-right-color: var(--primary);
+        font-weight: 600;
+    }
+    .sidebar-link i {
+        width: 20px;
+        font-size: 1.1rem;
+    }
+</style>

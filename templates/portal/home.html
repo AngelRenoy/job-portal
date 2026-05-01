@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-primary text-white py-5 mb-5">
+    <div class="container py-5 text-center">
+        <h1 class="display-4 fw-bold">Find Your Dream Job</h1>
+        <p class="lead mb-4">The intelligent way to match your skills with the perfect career.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'job_list' %}" class="btn btn-light btn-lg">Browse Jobs</a>
+            {% if not user.is_authenticated or user.role == 'recruiter' %}
+                <a href="{% if user.is_authenticated %}{% url 'post_job' %}{% else %}{% url 'register' %}{% endif %}" class="btn btn-outline-light btn-lg">Post a Job</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <h2 class="fw-bold mb-4">Latest Opportunities</h2>
+    <div class="row g-4">
+        {% for job in jobs %}
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <h5 class="fw-bold">{{ job.title }}</h5>
+                <p class="text-muted small">{{ job.location }}</p>
+                <p class="mb-4">{{ job.description|truncatewords:20 }}</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <span class="text-primary fw-bold">{{ job.salary|default:"Competitive" }}</span>
+                    <a href="{% url 'job_detail' job.pk %}" class="btn btn-sm btn-outline-primary">Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

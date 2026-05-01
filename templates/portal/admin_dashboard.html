@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-0">
+        {% include 'portal/admin_sidebar.html' %}
+
+        <div class="col-md-10 py-5 px-5">
+            <div class="mb-5">
+                <h1 class="fw-bold h3 mb-1">Dashboard Overview</h1>
+                <p class="text-muted">Welcome back, Admin. Here's what's happening today.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="premium-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                                <i class="fas fa-users text-primary"></i>
+                            </div>
+                            <span class="text-muted fw-medium">Total Users</span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ stats.total_users }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="premium-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-opacity-10 p-3 rounded-3 me-3">
+                                <i class="fas fa-briefcase text-success"></i>
+                            </div>
+                            <span class="text-muted fw-medium">Live Jobs</span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ stats.total_jobs }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="premium-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info bg-opacity-10 p-3 rounded-3 me-3">
+                                <i class="fas fa-file-invoice text-info"></i>
+                            </div>
+                            <span class="text-muted fw-medium">Applications</span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ stats.total_apps }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="premium-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+                                <i class="fas fa-clock text-warning"></i>
+                            </div>
+                            <span class="text-muted fw-medium">Pending Approvals</span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ stats.pending_recruiters|add:stats.pending_jobs }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Recent Jobs -->
+                <div class="col-lg-7">
+                    <div class="premium-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">Recent Job Posts</h5>
+                            <a href="{% url 'admin_jobs' %}" class="btn btn-link text-primary text-decoration-none fw-bold small p-0">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0">
+                                <thead>
+                                    <tr class="text-muted small text-uppercase">
+                                        <th class="ps-0">Job Title</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in recent_jobs %}
+                                    <tr>
+                                        <td class="ps-0 fw-bold">{{ job.title }}</td>
+                                        <td class="text-muted small">{{ job.created_at|date:"M d, Y" }}</td>
+                                        <td class="text-end">
+                                            {% if job.is_approved %}
+                                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Approved</span>
+                                            {% else %}
+                                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Users -->
+                <div class="col-lg-5">
+                    <div class="premium-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">New Users</h5>
+                            <a href="{% url 'admin_users' %}" class="btn btn-link text-primary text-decoration-none fw-bold small p-0">View All</a>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            {% for u in recent_users %}
+                            <div class="list-group-item px-0 py-3 d-flex align-items-center border-0 border-bottom">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-user-circle text-secondary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">{{ u.username }}</div>
+                                    <div class="text-muted smaller text-capitalize">{{ u.role }}</div>
+                                </div>
+                                <div class="text-muted smaller">{{ u.date_joined|timesince }} ago</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .smaller { font-size: 0.75rem; }
+</style>
+{% endblock %}

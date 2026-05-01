@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="job-detail-wrapper py-5" style="background-color: #f8f9fa;">
+    <div class="container">
+        <!-- Job Header Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-8 p-4 p-lg-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold small text-uppercase">
+                                <i class="fas fa-layer-group me-1"></i> {{ job.category.name }}
+                            </span>
+                            <span class="ms-3 text-muted small">
+                                <i class="far fa-clock me-1"></i> Posted {{ job.created_at|timesince }} ago
+                            </span>
+                        </div>
+                        <h1 class="display-6 fw-bold text-dark mb-2">{{ job.title }}</h1>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="fas fa-building me-2 text-primary"></i>
+                                <span>{{ job.posted_by.username }}</span>
+                            </div>
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                                <span>{{ job.location }}</span>
+                            </div>
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                <span>{{ job.salary|default:"Competitive Salary" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            {% if user.role == 'job_seeker' %}
+                                {% if has_applied %}
+                                    <button class="btn btn-success btn-lg px-5 rounded-pill disabled">
+                                        <i class="fas fa-check-circle me-2"></i> Applied
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#applyModal">
+                                        Apply Now <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                {% endif %}
+                            {% elif not user.is_authenticated %}
+                                <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                                    Login to Apply
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 bg-primary bg-opacity-10 d-none d-md-flex align-items-center justify-content-center">
+                        <div class="text-center p-4">
+                            {% if analysis %}
+                                <div class="match-score-circle mb-3">
+                                    <svg viewBox="0 0 36 36" class="circular-chart {% if analysis.score > 70 %}green{% elif analysis.score > 40 %}orange{% else %}red{% endif %}">
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle" stroke-dasharray="{{ analysis.score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <text x="18" y="20.35" class="percentage">{{ analysis.score }}%</text>
+                                    </svg>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1">Match Score</h5>
+                                <p class="text-muted small mb-0">Based on your profile skills</p>
+                            {% else %}
+                                <i class="fas fa-briefcase fa-5x text-primary opacity-20"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Job Info -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <h4 class="fw-bold text-dark mb-4 border-start border-primary border-4 ps-3">Job Description</h4>
+                        <div class="job-description text-muted lh-lg" style="white-space: pre-line;">
+                            {{ job.description }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <h4 class="fw-bold text-dark mb-4 border-start border-primary border-4 ps-3">Skill Matching</h4>
+                        
+                        {% if user.role == 'job_seeker' %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-success mb-3">
+                                        <i class="fas fa-check-circle me-2"></i> Matched Skills ({{ analysis.matching|length }})
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% for skill in analysis.matching %}
+                                            <span class="skill-tag matched">{{ skill }}</span>
+                                        {% empty %}
+                                            <span class="text-muted small italic">No matching skills found</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-danger mb-3">
+                                        <i class="fas fa-times-circle me-2"></i> Missing Skills ({{ analysis.missing|length }})
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% for item in analysis.missing %}
+                                            <span class="skill-tag missing">{{ item.name }}</span>
+                                        {% empty %}
+                                            <span class="text-muted small italic">You have all required skills!</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for skill in job.required_skills.all %}
+                                    <span class="skill-tag neutral">{{ skill.name }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if analysis.missing %}
+                <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-10 border-start border-primary border-5">
+                    <div class="card-body p-4 p-lg-5">
+                        <h4 class="fw-bold text-dark mb-4">
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i> Recommended Courses
+                        </h4>
+                        <p class="text-muted mb-4">Bridge your skill gap with these top-rated courses:</p>
+                        <div class="row g-3">
+                            {% for item in analysis.missing %}
+                            <div class="col-md-6">
+                                <a href="{{ item.link }}" target="_blank" class="course-card">
+                                    <div class="d-flex align-items-center">
+                                        <div class="course-icon me-3">
+                                            <i class="fas fa-play-circle"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ item.title }}</div>
+                                            <div class="text-muted small">Topic: {{ item.name }}</div>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-external-link-alt ms-auto opacity-50"></i>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark mb-4">Recruiter Information</h5>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="avatar-circle me-3">
+                                {{ job.posted_by.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ job.posted_by.username }}</h6>
+                                <p class="text-muted small mb-0">Verified Recruiter</p>
+                            </div>
+                        </div>
+                        <hr class="opacity-10">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3 d-flex align-items-center text-muted">
+                                <i class="fas fa-envelope me-3 text-primary"></i>
+                                <span>{{ job.posted_by.email }}</span>
+                            </li>
+                            <li class="d-flex align-items-center text-muted">
+                                <i class="fas fa-phone me-3 text-primary"></i>
+                                <span>{{ job.posted_by.phone|default:"Not provided" }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 bg-dark text-white overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-shield-alt text-warning me-2"></i>
+                            <h6 class="fw-bold mb-0">SmartHire Safety Tips</h6>
+                        </div>
+                        <p class="small opacity-75 mb-0">
+                            Never provide your bank details or pay any fees for job applications. Report suspicious postings immediately.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apply Modal -->
+<div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-paper-plane fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">Submit Application</h4>
+                    <p class="text-muted">Applying for <strong>{{ job.title }}</strong></p>
+                </div>
+                
+                <form action="{% url 'apply_job' job.pk %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Resume / CV</label>
+                        {% if user.seeker_profile.resume %}
+                            <div class="p-3 border rounded-3 bg-light mb-2 d-flex align-items-center">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                <span class="text-truncate small">{{ user.seeker_profile.resume.name }}</span>
+                                <span class="badge bg-success ms-auto">Current</span>
+                            </div>
+                            <p class="small text-muted mb-3">We'll use your stored resume. Upload a new one to replace it for this application only.</p>
+                        {% endif %}
+                        <input type="file" name="resume" class="form-control" {% if not user.seeker_profile.resume %}required{% endif %}>
+                    </div>
+                    
+                    <div class="alert alert-info border-0 rounded-3 small">
+                        <i class="fas fa-info-circle me-2"></i> Your contact details will be shared with the recruiter.
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold">
+                        Confirm Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .job-detail-wrapper {
+        min-height: 100vh;
+    }
+    .skill-tag {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    .skill-tag.matched {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+    }
+    .skill-tag.missing {
+        background-color: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+    }
+    .skill-tag.neutral {
+        background-color: #e9ecef;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+    .skill-tag:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .course-card {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem;
+        background: white;
+        border-radius: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .course-card:hover {
+        border-color: #4361ee;
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .course-icon {
+        width: 40px;
+        height: 40px;
+        background: #4361ee;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        background: #4361ee;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    
+    /* Circular Chart */
+    .match-score-circle {
+        width: 120px;
+        margin: 0 auto;
+    }
+    .circular-chart {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        max-height: 250px;
+    }
+    .circle-bg {
+        fill: none;
+        stroke: #eee;
+        stroke-width: 3.8;
+    }
+    .circle {
+        fill: none;
+        stroke-width: 2.8;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+    }
+    @keyframes progress {
+        0% { stroke-dasharray: 0 100; }
+    }
+    .circular-chart.green .circle { stroke: #4cc790; }
+    .circular-chart.orange .circle { stroke: #ff9f00; }
+    .circular-chart.red .circle { stroke: #ff5c5c; }
+    .percentage {
+        fill: #333;
+        font-family: sans-serif;
+        font-size: 0.5em;
+        text-anchor: middle;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <!-- Profile Completion Bar -->
+            <div class="card p-3 mb-4 border-0 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-bold">Profile Completion</span>
+                    <span class="small fw-bold text-primary">{{ completion }}%</span>
+                </div>
+                <div class="progress" style="height: 10px; border-radius: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ completion }}%; background: linear-gradient(90deg, #4361ee, #4cc9f0);"></div>
+                </div>
+                {% if completion < 100 %}
+                    <p class="small text-muted mt-2 mb-0">Complete your profile to stand out to recruiters!</p>
+                {% endif %}
+            </div>
+
+            <div class="card p-4 shadow-sm border-0">
+                {% if not profile.skills.exists %}
+                    <div class="alert alert-info border-0 small mb-4 py-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-magic me-2 h5 mb-0"></i>
+                            <div>
+                                <div class="fw-bold">Enable AI Matching!</div>
+                                <a href="{% url 'update_profile' %}" class="text-dark fw-bold">Select your skills</a> to see your job match scores.
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="text-center mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="fas fa-user-tie text-primary display-4"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">{{ user.username }}</h4>
+                    <p class="text-muted small">{{ user.email }}</p>
+                    <a href="{% url 'update_profile' %}" class="btn btn-outline-primary btn-sm px-4">Edit Profile</a>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-tools me-2 text-primary"></i>My Skills</h6>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for skill in profile.skills.all %}
+                            <span class="badge bg-light text-primary border border-primary-subtle px-3 py-2">{{ skill.name }}</span>
+                        {% empty %}
+                            <span class="text-muted small">No skills added yet.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-file-pdf me-2 text-primary"></i>Resume</h6>
+                    {% if profile.resume %}
+                        <div class="d-flex align-items-center p-2 bg-light rounded">
+                            <i class="fas fa-file-alt text-danger me-2 h4 mb-0"></i>
+                            <div class="overflow-hidden">
+                                <div class="text-truncate small fw-bold">{{ profile.resume.name }}</div>
+                                <a href="{{ profile.resume.url }}" class="small text-primary" target="_blank">Download</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning p-2 small mb-0">
+                            <i class="fas fa-exclamation-triangle me-1"></i> No resume uploaded.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Bio</h6>
+                    <p class="text-muted small mb-0">{{ profile.bio|default:"No bio added." }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Table -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">My Applications</h5>
+                    <span class="badge bg-primary rounded-pill">{{ apps.count }} Total</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 px-4">Job Title</th>
+                                <th class="border-0">Company</th>
+                                <th class="border-0">Date Applied</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0 text-end px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in apps %}
+                            <tr>
+                                <td class="px-4 fw-bold">{{ app.job.title }}</td>
+                                <td>{{ app.job.posted_by.username }}</td>
+                                <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if app.status == 'applied' %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1">Applied</span>
+                                    {% elif app.status == 'reviewed' %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1">Reviewed</span>
+                                    {% elif app.status == 'shortlisted' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">Shortlisted</span>
+                                    {% elif app.status == 'accepted' %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1">Accepted</span>
+                                    {% elif app.status == 'rejected' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end px-4">
+                                    <a href="{% url 'job_detail' app.job.pk %}" class="btn btn-sm btn-outline-primary">View Job</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <p class="text-muted mb-0">You haven't applied for any jobs yet.</p>
+                                    <a href="{% url 'job_list' %}" class="btn btn-primary btn-sm mt-3">Explore Jobs</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

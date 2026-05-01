@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .sidebar { min-height: calc(100vh - 70px); background: white; padding-top: 2rem; }
+    .sidebar-link { display: block; padding: 0.8rem 1.5rem; color: #4b5563; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
+    .sidebar-link:hover { background: #f3f4f6; color: #4361ee; }
+    .sidebar-link.active { background: #eef2ff; color: #4361ee; border-left-color: #4361ee; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'portal/admin_sidebar.html' %}
+
+        <div class="col-md-10 py-4 px-4">
+            <h2 class="fw-bold mb-4">Portal Settings</h2>
+
+            <div class="card shadow-sm border-0 col-lg-6">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Portal Name</label>
+                            <input type="text" class="form-control" value="SmartHire Intelligent Portal">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Admin Email Notifications</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Notify on new recruiter registration</label>
+                            </div>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Notify on job postings</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary px-4">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

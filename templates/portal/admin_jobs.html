@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-0">
+        {% include 'portal/admin_sidebar.html' %}
+
+        <div class="col-md-10 py-5 px-5">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-bold h3 mb-1">Manage Job Postings</h1>
+                    <p class="text-muted">Approve, reject, or manage all job listings across the platform.</p>
+                </div>
+                <div class="badge bg-primary px-4 py-2 rounded-pill h5 mb-0">
+                    {{ jobs.count }} Total Jobs
+                </div>
+            </div>
+
+            <div class="premium-card overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small text-uppercase fw-bold">
+                            <tr>
+                                <th class="px-4 py-3">Job Details</th>
+                                <th>Category</th>
+                                <th>Posted By</th>
+                                <th>Status</th>
+                                <th class="text-end px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            {% for job in jobs %}
+                            <tr>
+                                <td class="px-4 py-3">
+                                    <div class="fw-bold text-dark">{{ job.title }}</div>
+                                    <div class="text-muted smaller"><i class="fas fa-map-marker-alt me-1"></i>{{ job.location }}</div>
+                                </td>
+                                <td><span class="badge bg-light text-secondary rounded-pill px-3">{{ job.category.name }}</span></td>
+                                <td>
+                                    <div class="small fw-bold">{{ job.posted_by.username }}</div>
+                                    <div class="smaller text-muted">{{ job.created_at|date:"M d, Y" }}</div>
+                                </td>
+                                <td>
+                                    {% if job.is_approved %}
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pending Approval</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end px-4">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm rounded-circle" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            {% if not job.is_approved %}
+                                                <li><a class="dropdown-item text-success" href="{% url 'approve_job' job.pk %}"><i class="fas fa-check me-2"></i>Approve</a></li>
+                                            {% endif %}
+                                            <li><a class="dropdown-item text-danger" href="{% url 'admin_delete_job' job.pk %}" onclick="return confirm('Delete this job post?')"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No jobs found in the system.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
