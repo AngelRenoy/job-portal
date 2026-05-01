@@ -94,6 +94,12 @@ DATABASES = {
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     DATABASES['default'] = dj_database_url.parse(database_url)
+    # Aiven requires SSL, and you have downloaded ca.pem
+    DATABASES['default']['OPTIONS'] = {
+        'ssl': {
+            'ca': os.path.join(BASE_DIR, 'ca.pem')
+        }
+    }
 
 AUTH_USER_MODEL = 'portal.User'
 
