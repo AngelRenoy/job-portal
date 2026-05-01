@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('dashboard-redirect/', views.dashboard_redirect, name='dashboard_redirect'),
     path('register/', views.register, name='register'),
     
     # Admin

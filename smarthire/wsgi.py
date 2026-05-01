@@ -19,7 +19,9 @@ try:
     from django.contrib.auth import get_user_model
     User = get_user_model()
     if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+        admin_user = User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+        admin_user.role = 'admin'
+        admin_user.save()
         print("Superuser 'admin' created automatically.")
 except Exception as e:
     print(f"Skipping superuser creation: {e}")

@@ -78,6 +78,15 @@ def home(request):
     jobs = Job.objects.filter(is_approved=True).order_by('-created_at')[:6]
     return render(request, 'portal/home.html', {'jobs': jobs})
 
+@login_required
+def dashboard_redirect(request):
+    if request.user.role == User.IS_ADMIN:
+        return redirect('admin_dashboard')
+    elif request.user.role == User.IS_RECRUITER:
+        return redirect('recruiter_dashboard')
+    else:
+        return redirect('seeker_dashboard')
+
 def register(request):
     if request.method == 'POST':
         username = request.POST.get('username')
