@@ -29,5 +29,9 @@ try:
             admin_user.role = 'admin'
             admin_user.save()
             print("Updated existing admin role to 'admin'.")
+            
+    # Also ensure basic Categories and Skills are seeded
+    from django.core.management import call_command
+    call_command('seed_data')
 except Exception as e:
-    print(f"Skipping superuser creation: {e}")
+    print(f"Skipping startup scripts (likely migrating): {e}")
